@@ -2,16 +2,20 @@ local Types = require("../Types")
 local Util = require("../Utility")
 
 type Dictionary<K = any, V = any> = Types.Dictionary<K, V>
-type func<T... = ...any, R... = ...any> = Types.Func<T..., R...>
+type Predicate<V = any, K = any, R = any> = Types.Predicate<V, K, R>
 
-local function count<K, V>(Dictionary: Dictionary<K, V>, predicate: func<(V, K, Dictionary<K, V>), (any)>?): number
+local function count<K, V>(Dictionary: Dictionary<K, V>, predicate: Predicate<V, K, any>?): number
 	local total_count = 0
 
-	if not predicate or type(predicate) ~= "function" then
-		predicate = Util.functions.truthy
-	end
+	local final_predicate: Predicate<V, K, any>
 
-	local final_predicate: func<(V, K, Dictionary<K, V>), (any)> = predicate :: func<(V, K, Dictionary<K, V>), (any)>
+	if not predicate or type(predicate) ~= "function" then
+		final_predicate = function(_value: V, _key: K, _dictionary: Dictionary<K, V>): boolean
+			return Util.functions.truthy()
+		end
+	else
+		final_predicate = predicate
+	end
 
 	for k, v in Dictionary do
 		if final_predicate(v, k, Dictionary) then
