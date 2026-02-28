@@ -1,16 +1,22 @@
 local Types = require("../Types")
 
-type Predicate<V, K, R> = Types.Predicate<V, K, R>
+type PredicateDictionary<V, K, R> = Types.PredicateDictionary<V, K, R>
+type PredicateArray<T, R> = Types.PredicateArray<T, R>
 
 local function truthy(): true
 	return true
 end
 
-local function default_predicate<K, V>(predicate: Predicate<V, K, any>?)
+local function dictionary_predicate<K, V>(predicate: PredicateDictionary<V, K, any>?)
+	return predicate or truthy
+end
+
+local function array_predicate<T>(predicate: PredicateArray<T, any>?)
 	return predicate or truthy
 end
 
 return {
 	truthy = truthy,
-	default_predicate = default_predicate,
+	dictionary_predicate = dictionary_predicate,
+	array_predicate = array_predicate,
 }
