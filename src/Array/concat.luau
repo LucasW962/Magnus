@@ -1,3 +1,5 @@
+--!native
+
 local Types = require("../Types")
 
 type Concat<t...> = Types.Concat<t...>
@@ -30,14 +32,15 @@ local function concat<t...>(...: t...): Concat<t...>
 	end
 
 	local result = table.create(totalLength)
-	local outIndex = 0
+	local outIndex = 1
 
 	for i = 1, argumentCount do
 		local array = select(i, ...) :: any
 		if type(array) == "table" then
-			for j = 1, #array do
-				outIndex += 1
-				result[outIndex] = array[j]
+			local length = #array
+			if length > 0 then
+				table.move(array, 1, length, outIndex, result)
+				outIndex += length
 			end
 		end
 	end

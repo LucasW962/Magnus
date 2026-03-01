@@ -1,7 +1,22 @@
 local Types = require("../Types")
-local copy_deep = require("./copy_deep")
 
 type Concat<t...> = Types.Concat<t...>
+
+local function deep_clone_value(value: any): any
+	if type(value) ~= "table" then
+		return value
+	end
+
+	local cloned = table.clone(value)
+
+	for key, child in cloned do
+		if type(child) == "table" then
+			cloned[key] = deep_clone_value(child)
+		end
+	end
+
+	return cloned
+end
 
 --[=[
 	@function concat_deep
@@ -32,15 +47,21 @@ local function concat_deep<t...>(...: t...): Concat<t...>
 	end
 
 	local result = table.create(totalLength)
-	local outIndex = 0
+	local outIndex = 1
 
 	for i = 1, argumentCount do
 		local array = select(i, ...) :: any
 		if type(array) == "table" then
-			for j = 1, #array do
-				outIndex += 1
+			local length = #array
+
+			if length == 0 then
+				continue
+			end
+
+			for j = 1, length do
 				local item = array[j]
-				result[outIndex] = if type(item) == "table" then copy_deep(item) else item
+				result[outIndex] = if type(item) == "table" then deep_clone_value(item) else item
+				outIndex += 1
 			end
 		end
 	end
