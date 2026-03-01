@@ -12,13 +12,6 @@ type MergeFromSig<sig> = Types.MergeFromSig<sig>
     @note for proper intellisense for the type of the returned table, use an instantiated generic function pack
 
     ```lua
-    local Types = require("../Types")
-
-    local function merge<T>(...: T): Types.MergeFromSig<T>
-        return
-    end
-
-
     local dict_1 = {
         ["hello"] = 5
     }
@@ -27,7 +20,7 @@ type MergeFromSig<sig> = Types.MergeFromSig<sig>
         ["hello2"] = 7
     }
 
-    local tbl = merge<<(typeof(dict_1), typeof(dict_2)) -> ()>>()
+    local tbl = merge<<(typeof(dict_1), typeof(dict_2)) -> ()>>() -- {hello: number, hello2: number}
     ```
 ]=]
 local function merge<sig>(...: sig): MergeFromSig<sig>

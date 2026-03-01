@@ -1,5 +1,5 @@
 local Types = require("../Types")
-local copy_deep = require("@self/copy_deep")
+local copy_deep = require("./copy_deep")
 
 type MergeFromSig<sig> = Types.MergeFromSig<sig>
 

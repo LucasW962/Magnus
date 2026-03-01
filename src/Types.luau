@@ -144,6 +144,70 @@ type function fn_predicateFromArray(object: type, resultType: type)
 	}, nil)
 end
 
+type function fn_merge(sig: type)
+	local tables = sig:parameters().head
+	assert(tables)
+
+	local result = types.newtable()
+
+	for _, tableType in tables do
+		if not tableType:is("table") then
+			return types.newtable()
+		end
+
+		local indexer = tableType:indexer()
+		if indexer ~= nil then
+			result:setreadindexer(indexer.index, indexer.readresult)
+			result:setwriteindexer(indexer.index, indexer.writeresult)
+		end
+
+		for key, prop in tableType:properties() do
+			if prop.read ~= prop.write then
+				result:setreadproperty(key, prop.read)
+				result:setwriteproperty(key, prop.write)
+			else
+				result:setproperty(key, prop.read)
+			end
+		end
+	end
+
+	return result
+end
+
+type function fn_concat(sig: type)
+	local arrays = sig:parameters().head
+	assert(arrays)
+
+	local elementTypes: { type } = {}
+
+	for _, arrayType in arrays do
+		if arrayType:is("table") then
+			local elementType = ValuesOf(arrayType)
+			if elementType.tag ~= "never" then
+				elementTypes[#elementTypes + 1] = elementType
+			end
+		end
+	end
+
+	local result = types.newtable()
+
+	if #elementTypes == 0 then
+		result:setindexer(types.number, types.never)
+	elseif #elementTypes == 1 then
+		result:setindexer(types.number, elementTypes[1])
+	else
+		result:setindexer(types.number, types.unionof(unpack(elementTypes)))
+	end
+
+	return result
+end
+
+export type Merge<t...> = fn_merge<(t...) -> ()>
+
+export type MergeFromSig<sig> = fn_merge<sig>
+export type Concat<t...> = fn_concat<(t...) -> ()>
+export type ConcatFromSig<sig> = fn_concat<sig>
+
 export type PredicateFromDictionary<object, R = any> = fn_predicateFromDictionary<object, R>
 export type KeyPredicateFromDictionary<object, R = any> = fn_keyPredicateFromDictionary<object, R>
 export type PredicateFromArray<object, R = any> = fn_predicateFromArray<object, R>
