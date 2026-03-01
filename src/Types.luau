@@ -77,6 +77,77 @@ export type function EntriesOf(object: type)
 	return result
 end
 
+type function fn_predicateFromDictionary(object: type, resultType: type)
+	if object.tag ~= "table" then
+		return types.newfunction({
+			head = { types.any, types.any, object },
+			tail = nil,
+		}, {
+			head = { resultType },
+			tail = nil,
+		}, nil)
+	end
+
+	local valueType = ValuesOf(object)
+	local keyType = KeysOf(object)
+
+	return types.newfunction({
+		head = { valueType, keyType, object },
+		tail = nil,
+	}, {
+		head = { resultType },
+		tail = nil,
+	}, nil)
+end
+
+type function fn_keyPredicateFromDictionary(object: type, resultType: type)
+	if object.tag ~= "table" then
+		return types.newfunction({
+			head = { types.any, object },
+			tail = nil,
+		}, {
+			head = { resultType },
+			tail = nil,
+		}, nil)
+	end
+
+	local keyType = KeysOf(object)
+
+	return types.newfunction({
+		head = { keyType, object },
+		tail = nil,
+	}, {
+		head = { resultType },
+		tail = nil,
+	}, nil)
+end
+
+type function fn_predicateFromArray(object: type, resultType: type)
+	if object.tag ~= "table" then
+		return types.newfunction({
+			head = { types.any, types.number, object },
+			tail = nil,
+		}, {
+			head = { resultType },
+			tail = nil,
+		}, nil)
+	end
+
+	local valueType = ValuesOf(object)
+
+	return types.newfunction({
+		head = { valueType, types.number, object },
+		tail = nil,
+	}, {
+		head = { resultType },
+		tail = nil,
+	}, nil)
+end
+
+export type PredicateFromDictionary<object, R = any> = fn_predicateFromDictionary<object, R>
+export type KeyPredicateFromDictionary<object, R = any> = fn_keyPredicateFromDictionary<object, R>
+export type PredicateFromArray<object, R = any> = fn_predicateFromArray<object, R>
+
 export type function DeepFreeze(object: type)
 	local tag = object.tag
 

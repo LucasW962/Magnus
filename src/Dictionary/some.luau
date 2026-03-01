@@ -1,10 +1,9 @@
 local Types = require("../Types")
 
-type Dictionary<K, V> = Types.Dictionary<K, V>
-type Predicate<V, K, R = any> = Types.PredicateDictionary<V, K, R>
+type Predicate<T, R = any> = (value: Types.ValuesOf<T>, key: Types.KeysOf<T>, dictionary: T) -> R
 
-local function some<K, V>(Dictionary: Dictionary<K, V>, Predicate: Predicate<V, K>): boolean
-	for k, v in Dictionary do
+local function some<T>(Dictionary: T, Predicate: Predicate<T, any>): boolean
+	for k, v in Dictionary :: any do
 		if Predicate(v, k, Dictionary) then
 			return true
 		end

@@ -1,5 +1,5 @@
 --[=[
-    Utility is private outside of sift, used interally for functions
+    Utility is private outside of Magnus, used interally for functions
 ]=]
 
 local functions = require("@self/functions")

@@ -3,6 +3,7 @@ local Types = require("../Types")
 type Array<T = number> = Types.Array<T>
 type DeepFreeze<type> = Types.DeepFreeze<type>
 
+
 local function freeze_deep<T>(array: Array<T>): DeepFreeze<Array<T>>
     local seen: { [any]: true } = {}
 
@@ -17,7 +18,7 @@ local function freeze_deep<T>(array: Array<T>): DeepFreeze<Array<T>>
 
         seen[value] = true
 
-        for _, child in pairs(value) do
+        for _, child in value do
             recurse(child)
         end
 
@@ -27,6 +28,10 @@ local function freeze_deep<T>(array: Array<T>): DeepFreeze<Array<T>>
 
     return recurse(array) :: any
 end
+
+
+
+
 
 return freeze_deep
 
