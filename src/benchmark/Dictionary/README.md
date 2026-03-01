@@ -3,7 +3,8 @@
 All benchmarks are in comparision to Sift (found here https://github.com/cxmeel/sift)
 
 
-## Count
+## Some
 
-![Count (no_predicate) benchmark](./imgs/count(no_predicate).png)
-![Count (predicate) benchmark text](./imgs/count(predicate).png)
+![Some](./imgs/some.png)
+
+unsuprisingly, same speeds as they do the same thing, Magnus just has better type support
