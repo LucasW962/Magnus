@@ -14,7 +14,7 @@ end
     @param predicate<T, R>? (value: Types.ValuesOf<T>, key: Types.KeysOf<T>, dictionary: T) -> R -- how the dictionary should be filtered
     @return number -- number of items in dictionary
 
-    @note for proper usage, use an instantiated generic to pass the type of the array in for T
+    @note for proper usage, use an instantiated generic to pass the type of the Dictionary in for T
 
     ```lua
     

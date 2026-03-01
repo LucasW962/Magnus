@@ -4,6 +4,15 @@ type Array<T = number> = Types.Array<T>
 type DeepFreeze<type> = Types.DeepFreeze<type>
 
 
+--[=[
+    @function freeze_deep
+    @within Array
+
+    @param array Array<T> -- array to deeply freeze
+    @return DeepFreeze<Array<T>> -- deeply frozen array type
+
+    @note runtime freezing is recursive and cycle-safe
+]=]
 local function freeze_deep<T>(array: Array<T>): DeepFreeze<Array<T>>
     local seen: { [any]: true } = {}
 
