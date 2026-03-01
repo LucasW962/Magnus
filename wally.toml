@@ -1,0 +1,10 @@
+[package]
+name = "lucasw962/magnus"
+description = "Immutable library based off Sift built for the new type solver"
+version = "0.1.2"
+license = "MIT"
+authors = ["lucasw962"]
+
+registry = "https://github.com/UpliftGames/wally-index"
+repository = "https://github.com/LucasW962/Magnus"
+realm = "shared"

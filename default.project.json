@@ -1,14 +1,7 @@
 {
-  "name": "Magnus",
+  "name": "magnus",
   "tree": {
-    "$className": "DataModel",
-
-    "ReplicatedStorage": {
-      "Magnus": {
-        "$path": "src"
-      }
-    }
-
+    "$path": "src"
   
   }
 }
