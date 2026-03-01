@@ -8,3 +8,4 @@ authors = ["lucasw962"]
 registry = "https://github.com/UpliftGames/wally-index"
 repository = "https://github.com/LucasW962/Magnus"
 realm = "shared"
+exclude = ["benchmark", "benchmark/**"]

@@ -38,8 +38,12 @@ local function freeze_deep<T>(array: Array<T>): DeepFreeze<Array<T>>
     return recurse(array) :: any
 end
 
+local arr = {
+    1,2,3
+}
 
-
+local frozen = freeze_deep(arr)
+frozen[1] = 5
 
 
 return freeze_deep
