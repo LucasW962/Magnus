@@ -10,6 +10,8 @@ local SiftDictionary = Sift.Dictionary
 local MagnusMerge = MagnusDictionary.merge
 local SiftMerge = SiftDictionary.merge
 
+local INNER_ITERATIONS = 1000
+
 local sample = {
 	a = 1,
 	b = 2,
@@ -38,24 +40,21 @@ local second_sample = {
 return {
 
 	ParameterGenerator = function()
-		-- This function is called before running your function (outside the timer)
-		-- and the return(s) are passed into your function arguments (after the Profiler). This sample
-		-- will pass the function a random number, but you can make it pass
-		-- arrays, Vector3s, or anything else you want to test your function on.
-		return math.random(1000)/10
+		return nil -- not needed
 	end;
 
 	Functions = {
-		["Magnus.Dict.Merge"] = function(Profiler, RandomNumber) -- You can change "Sample A" to a descriptive name for your function
-			local entries = MagnusMerge<<(typeof(sample), typeof(second_sample)) -> ()>>(sample, second_sample)
+		["Magnus.Dict.Merge"] = function()
+			for _ = 1, INNER_ITERATIONS do
+				MagnusMerge<<(typeof(sample), typeof(second_sample)) -> ()>>(sample, second_sample)
+			end
 		end;
 
-		["Sift.Dict.Merge"] = function(Profiler, RandomNumber)
-			local entries = SiftMerge(sample, second_sample)
-			
+		["Sift.Dict.Merge"] = function()
+			for _ = 1, INNER_ITERATIONS do
+				SiftMerge(sample, second_sample)
+			end
 		end;
-
-		-- You can add as many functions as you like! Adding more will take longer to test, of course.
 	};
 
 }

@@ -1,6 +1,5 @@
 --!optimize 2
 
-
 local Sift = require(game.ReplicatedStorage.sift)
 local Magnus = require(game.ReplicatedStorage.Magnus)
 
@@ -9,6 +8,8 @@ local SiftDictionary = Sift.Dictionary
 
 local MagnusSome = MagnusDictionary.some
 local SiftSome = SiftDictionary.some
+
+local INNER_ITERATIONS = 1000
 
 local sample = {
 	a = 1,
@@ -23,34 +24,27 @@ local sample = {
 	list = { 1, 2, 3, 4, 5 },
 }
 
-
 return {
 
 	ParameterGenerator = function()
-		-- This function is called before running your function (outside the timer)
-		-- and the return(s) are passed into your function arguments (after the Profiler). This sample
-		-- will pass the function a random number, but you can make it pass
-		-- arrays, Vector3s, or anything else you want to test your function on.
-		return math.random(1000)/10
-	end;
+		return nil -- not needed
+	end,
 
 	Functions = {
-		["Magnus.Dict.Some"] = function(Profiler, RandomNumber) -- You can change "Sample A" to a descriptive name for your function
-			local some = MagnusSome<<typeof(sample)>>(sample, function(v, k, dict)
-				
-				return typeof(v) == "number"
-			end)
-			
-		end;
+		["Magnus.Dict.Some"] = function()
+			for _ = 1, INNER_ITERATIONS do
+				MagnusSome<<typeof(sample)>>(sample, function(v, k, dict)
+					return typeof(v) == "number"
+				end)
+			end
+		end,
 
-		["Sift.Dict.Some"] = function(Profiler, RandomNumber)
-			local some = SiftSome(sample, function(v, k, dict)
-				return typeof(v) == "number"
-			end)
-			
-		end;
-
-		-- You can add as many functions as you like! Adding more will take longer to test, of course.
-	};
-
+		["Sift.Dict.Some"] = function()
+			for _ = 1, INNER_ITERATIONS do
+				SiftSome(sample, function(v, k, dict)
+					return typeof(v) == "number"
+				end)
+			end
+		end,
+	},
 }
