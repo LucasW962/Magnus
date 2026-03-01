@@ -1,26 +1,25 @@
 local Types = require("../Types")
 
 type Pop<T, U> = Types.Pop<T, U>
+type Array<T> = Types.Array<T>
 
 --[=[
 	@function pop
 	@within Array
 
-	@param Array T -- array to pop values from
+	@param Array<T> -- array to pop values from
 	@param count U? -- number of values to remove from the end (defaults to 1)
-	@return Pop<T, U> -- array with the last `count` entries removed
+	@return Array<T> -- the array with the values popped
 
-	@note theres no support for number singletons, so if the type is {number | string} and you pop string,
-    the end result is still {number | string}
 
 	```lua
 	local pop = Magnus.Array.pop
 
 	local array = { 1, 2, "hello", "world" }
-	local result = pop<<typeof(array)>>(array, 2) -- { 1, 2 } still {number | string}
+	local result = pop(array, 2) -- { 1, 2 } 
 	```
 ]=]
-local function pop<T>(Array: T, count: number): Pop<T, number>
+local function pop<T>(Array: Array<T>, count: number): Array<T>
 	local removeCount = count :: any
 	if type(removeCount) ~= "number" then
 		removeCount = 1
