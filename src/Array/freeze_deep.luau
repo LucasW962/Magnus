@@ -1,0 +1,32 @@
+local Types = require("../Types")
+
+type Array<T = number> = Types.Array<T>
+type DeepFreeze<type> = Types.DeepFreeze<type>
+
+local function freeze_deep<T>(array: Array<T>): DeepFreeze<Array<T>>
+    local seen: { [any]: true } = {}
+
+    local function recurse(value: any)
+        if type(value) ~= "table" then
+            return value
+        end
+
+        if seen[value] then
+            return value
+        end
+
+        seen[value] = true
+
+        for _, child in pairs(value) do
+            recurse(child)
+        end
+
+        table.freeze(value)
+        return value
+    end
+
+    return recurse(array) :: any
+end
+
+return freeze_deep
+
