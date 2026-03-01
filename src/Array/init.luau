@@ -4,6 +4,9 @@ local concat_deep = require("@self/concat_deep")
 local copy = require("@self/copy")
 local copy_deep = require("@self/copy_deep")
 local freeze_deep = require("@self/freeze_deep")
+local filter = require("@self/filter")
+local map = require("@self/map")
+local pop = require("@self/pop")
 local some = require("@self/some")
 
 return {
@@ -13,5 +16,8 @@ return {
 	copy = copy,
 	copy_deep = copy_deep,
 	freeze_deep = freeze_deep,
+	filter = filter,
+	map = map,
+	pop = pop,
 	some = some,
 }

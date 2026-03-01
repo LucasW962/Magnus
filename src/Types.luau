@@ -202,11 +202,88 @@ type function fn_concat(sig: type)
 	return result
 end
 
+-- keeping this for future use, hopefully they add number literals...
+type function fn_pop(object: type, countType: type)
+	if object.tag ~= "table" then
+		return types.newtable()
+	end
+
+	local valueType = ValuesOf(object)
+	local fallback = types.newtable()
+	if valueType.tag ~= "never" then
+		fallback:setindexer(types.number, valueType)
+	end
+
+	if countType.tag ~= "singleton" then
+		return fallback
+	end
+
+	local singletonCount = countType:value() :: any
+	if type(singletonCount) ~= "number" then
+		return fallback
+	end
+
+	local removeCount = math.max(0, math.floor(singletonCount))
+	if removeCount == 0 then
+		return object
+	end
+
+	local indexer = object:indexer()
+	if indexer ~= nil then
+		local indexedFallback = types.newtable()
+		indexedFallback:setindexer(indexer.index, indexer.readresult)
+		return indexedFallback
+	end
+
+	local maxNumericKey = 0
+	for key in object:properties() do
+		if key.tag == "singleton" then
+			local maybeKey = key:value() :: any
+			if type(maybeKey) == "number" then
+				maxNumericKey = math.max(maxNumericKey, maybeKey)
+			end
+		end
+	end
+
+	local keepUpTo = maxNumericKey - removeCount
+	if keepUpTo <= 0 then
+		return types.newtable()
+	end
+
+	local result = types.newtable()
+
+	for key, prop in object:properties() do
+		local keep = true
+
+		if key.tag == "singleton" then
+			local maybeKey = key:value() :: any
+			if type(maybeKey) == "number" then
+				keep = maybeKey <= keepUpTo
+			end
+		end
+
+		if keep then
+			local readType = prop.read
+			if readType ~= nil then
+				if prop.write ~= nil and prop.write ~= readType then
+					result:setreadproperty(key, readType)
+					result:setwriteproperty(key, prop.write)
+				else
+					result:setproperty(key, readType)
+				end
+			end
+		end
+	end
+
+	return result
+end
+
 export type Merge<t...> = fn_merge<(t...) -> ()>
 
 export type MergeFromSig<sig> = fn_merge<sig>
 export type Concat<t...> = fn_concat<(t...) -> ()>
 export type ConcatFromSig<sig> = fn_concat<sig>
+export type Pop<object, count = number> = fn_pop<object, count>
 
 export type PredicateFromDictionary<object, R = any> = fn_predicateFromDictionary<object, R>
 export type KeyPredicateFromDictionary<object, R = any> = fn_keyPredicateFromDictionary<object, R>
