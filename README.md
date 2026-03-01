@@ -12,7 +12,7 @@ Immutable data library for Luau based on Sift, with a focus on type-safety and p
 ```toml
 # wally.toml
 [dependencies]
-Magnus = "lucasw962/magnus@0.1.2"
+Magnus = "lucasw962/magnus@0.2.0"
 ```
 
 ```bash
