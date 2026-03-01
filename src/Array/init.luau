@@ -8,8 +8,16 @@ local filter = require("@self/filter")
 local map = require("@self/map")
 local pop = require("@self/pop")
 local some = require("@self/some")
+local partition = require("@self/partition")
+local pick = require("@self/pick")
+local omit = require("@self/omit")
+local set = require("@self/set")
+local insert = require("@self/insert")
+local remove_index = require("@self/remove_index")
+local move = require("@self/move")
+local swap = require("@self/swap")
 
-return {
+return table.freeze({
 	count = count,
 	concat = concat,
 	concat_deep = concat_deep,
@@ -20,4 +28,12 @@ return {
 	map = map,
 	pop = pop,
 	some = some,
-}
+	partition = partition,
+	pick = pick,
+	omit = omit,
+	set = set,
+	insert = insert,
+	remove_index = remove_index,
+	move = move,
+	swap = swap,
+})

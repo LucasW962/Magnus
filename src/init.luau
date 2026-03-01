@@ -20,10 +20,15 @@ export type MergeFromSig<sig> = Types.MergeFromSig<sig>
 export type Concat<t...> = Types.Concat<t...>
 export type ConcatFromSig<sig> = Types.ConcatFromSig<sig>
 export type Pop<object, count = number> = Types.Pop<object, count>
+export type Omit<object, keys...> = Types.Omit<object, keys...>
+export type OmitFromSig<object, sig> = Types.OmitFromSig<object, sig>
+export type Pick<object, keys...> = Types.Pick<object, keys...>
+export type PickFromSig<object, sig> = Types.PickFromSig<object, sig>
 
 export type PredicateFromDictionary<object, R = any> = Types.PredicateFromDictionary<object, R>
 export type KeyPredicateFromDictionary<object, R = any> = Types.KeyPredicateFromDictionary<object, R>
 export type PredicateFromArray<object, R = any> = Types.PredicateFromArray<object, R>
+export type Partial<object> = Types.Partial<object>
 
 export type DeepFreeze<object> = Types.DeepFreeze<object>
 
@@ -49,13 +54,13 @@ export type DeepFreeze<object> = Types.DeepFreeze<object>
         ["yoda"] = true
     }
 
-    local currentCount = dictCount(dict, function(value, key: string, dictionary)
+    local currentCount = dictCount<<typeof(dict)>>(dict, function(value, key: string, dictionary)
         return key:find("hello") -- 2
     end)
     ```
 
 ]=]
-return {
+return table.freeze({
 	Dictionary = Dictionary,
 	Array = Array,
-}
+})

@@ -278,12 +278,119 @@ type function fn_pop(object: type, countType: type)
 	return result
 end
 
+type function shouldOmitKey(keyType: type, omittedKeys: { type }): boolean
+	for _, omittedKeyType in omittedKeys do
+		if omittedKeyType == keyType then
+			return true
+		end
+
+		if omittedKeyType.tag == "singleton" and keyType.tag == "singleton" then
+			if omittedKeyType:value() == keyType:value() then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+type function fn_omit(object: type, sig: type)
+	if object.tag ~= "table" then
+		return types.newtable()
+	end
+
+	if sig.tag ~= "function" then
+		return object
+	end
+
+	local params = sig:parameters().head
+	if params == nil then
+		return object
+	end
+
+	local omittedKeys: { type } = {}
+	for _, keyType in params do
+		omittedKeys[#omittedKeys + 1] = keyType
+	end
+
+	local result = types.newtable()
+
+	local indexer = object:indexer()
+	if indexer ~= nil then
+		result:setreadindexer(indexer.index, indexer.readresult)
+		result:setwriteindexer(indexer.index, indexer.writeresult)
+	end
+
+	for key, prop in object:properties() do
+		if not shouldOmitKey(key, omittedKeys) then
+			if prop.read ~= prop.write then
+				result:setreadproperty(key, prop.read)
+				result:setwriteproperty(key, prop.write)
+			else
+				result:setproperty(key, prop.read)
+			end
+		end
+	end
+
+	return result
+end
+
+type function fn_pick(object: type, sig: type)
+	if object.tag ~= "table" then
+		return types.newtable()
+	end
+
+	if sig.tag ~= "function" then
+		return types.newtable()
+	end
+
+	local params = sig:parameters().head
+	if params == nil then
+		return types.newtable()
+	end
+
+	local pickedKeys: { type } = {}
+	for _, keyType in params do
+		pickedKeys[#pickedKeys + 1] = keyType
+	end
+
+	local result = types.newtable()
+
+	for key, prop in object:properties() do
+		if shouldOmitKey(key, pickedKeys) then
+			if prop.read ~= prop.write then
+				result:setreadproperty(key, prop.read)
+				result:setwriteproperty(key, prop.write)
+			else
+				result:setproperty(key, prop.read)
+			end
+		end
+	end
+
+	local indexer = object:indexer()
+	if indexer ~= nil then
+		for _, pickedKeyType in pickedKeys do
+			if pickedKeyType.tag ~= "singleton" then
+				result:setreadindexer(indexer.index, indexer.readresult)
+				result:setwriteindexer(indexer.index, indexer.writeresult)
+				break
+			end
+		end
+	end
+
+	return result
+end
+
 export type Merge<t...> = fn_merge<(t...) -> ()>
 
 export type MergeFromSig<sig> = fn_merge<sig>
 export type Concat<t...> = fn_concat<(t...) -> ()>
 export type ConcatFromSig<sig> = fn_concat<sig>
 export type Pop<object, count = number> = fn_pop<object, count>
+export type Omit<object, keys...> = fn_omit<object, (keys...) -> ()>
+export type OmitFromSig<object, sig> = fn_omit<object, sig>
+export type Pick<object, keys...> = fn_pick<object, (keys...) -> ()>
+export type PickFromSig<object, sig> = fn_pick<object, sig>
 
 export type PredicateFromDictionary<object, R = any> = fn_predicateFromDictionary<object, R>
 export type KeyPredicateFromDictionary<object, R = any> = fn_keyPredicateFromDictionary<object, R>
@@ -327,6 +434,50 @@ export type function DeepFreeze(object: type)
 	end
 
 	return object
+end
+
+export type function Partial(object: type)
+	local tag = object.tag
+
+	if tag == "union" or tag == "intersection" then
+		local result
+
+		for _, component in object:components() do
+			if component.tag == "nil" then
+				continue
+			end
+			if result == nil then
+				result = component
+				continue
+			end
+
+			result = types.unionof(result, component)
+		end
+
+		return types.optional(result :: type)
+	elseif tag == "table" then
+		local result = types.newtable()
+		local indexer = object:indexer()
+
+		if indexer ~= nil then
+			result:setreadindexer(indexer.index, Partial(indexer.readresult))
+			result:setwriteindexer(indexer.index, indexer.writeresult)
+		end
+
+		for key, prop in object:properties() do
+			local partialRead = Partial(prop.read)
+			if prop.read ~= prop.write then
+				result:setreadproperty(key, partialRead)
+				result:setwriteproperty(key, prop.write)
+			else
+				result:setproperty(key, partialRead)
+			end
+		end
+
+		return result
+	end
+
+	return types.optional(object)
 end
 
 return 1
