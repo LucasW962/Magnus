@@ -10,28 +10,15 @@ type Array<T = any> = Types.Array<T>
 	@return Array<T> -- deep cloned value
 ]=]
 local function copy_deep<T>(Array: Array<T>): Array<T>
-	local seen: { [any]: any } = {}
+	local out = table.clone(Array)
 
-	local function clone(value: any): any
-		if type(value) ~= "table" then
-			return value
+	for key, value in Array do
+		if type(value) == "table" then
+			out[key] = copy_deep(value :: any)
 		end
-
-		if seen[value] ~= nil then
-			return seen[value]
-		end
-
-		local out = {}
-		seen[value] = out
-
-		for key, innerValue in value do
-			out[clone(key)] = clone(innerValue)
-		end
-
-		return out
 	end
 
-	return clone(Array) :: T
+	return out
 end
 
 return copy_deep
